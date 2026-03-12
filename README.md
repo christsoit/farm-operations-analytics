@@ -1,2 +1,2 @@
 # farm-operations-analytics
-Operations analytics project modeling a real vegetable distribution workflow including order intake, inventory checks, fulfillment preparation, delivery scheduling, and labor tracking.
+Operations analytics order modeling a vegetable distribution workflow including order intake, inventory checks, fulfillment preparation, delivery scheduling, and labor tracking.
