@@ -1,12 +1,13 @@
-# Schema Documentation
+# Schema
 
-This document describes the relational schema for the Farm Operations Analytics project. The schema is designed to model the workflow from raw order intake to cleaned orders, fulfillment preparation, delivery scheduling, and labor tracking.
+This document describes the relational schema for the Farm Operations Analytics project. The schema is designed to model the workflow from raw order intake to cleaned orders, inventory checks, fulfillment preparation, delivery scheduling, labor tracking, and outsourced product sourcing.
 
 ## Schema Overview
 
 The MVP schema includes the following core tables:
 
 - `customers`
+- `suppliers`
 - `products`
 - `inventory`
 - `incoming_orders_raw`
@@ -19,19 +20,36 @@ The MVP schema includes the following core tables:
 ## Table Definitions
 
 ### `customers`
-Stores master data for farm buyers such as wholesale markets, restaurants, and grocery customers.
+Stores master data for farm buyers such as wholesale markets, restaurants, grocery customers, and small individual buyers.
 
 **Primary Key**
 - `customer_id`
 
 **Key Columns**
 - `customer_name` - standardized customer name
-- `market_type` - customer segment such as restaurant, grocery, or wholesale market
+- `market_type` - customer segment such as wholesale market, restaurant, grocery store, or individual buyer
 - `region` - delivery or business region
 - `signup_date` - date the customer was added
 
 **Purpose**
 This table provides a clean customer reference for reporting, order tracking, and customer-level analytics.
+
+---
+
+### `suppliers`
+Stores external farm suppliers that provide outsourced products.
+
+**Primary Key**
+- `supplier_id`
+
+**Key Columns**
+- `supplier_name` - supplier farm name
+- `supplier_region` - supplier location or region
+- `supplier_type` - supplier category
+- `is_local` - indicates whether the supplier is local or non-local
+
+**Purpose**
+This table supports visibility into outsourced product sourcing and allows products to be linked to external suppliers.
 
 ---
 
@@ -41,14 +59,19 @@ Stores the product catalog for vegetables and produce items sold by the farm.
 **Primary Key**
 - `product_id`
 
+**Foreign Key**
+- `supplier_id` → `suppliers(supplier_id)`
+
 **Key Columns**
 - `product_name` - standardized product name
-- `category` - product grouping such as leafy greens, root vegetables, or herbs
-- `unit` - unit of measure such as box, crate, bunch, or pound
+- `category` - product grouping such as leafy greens, herbs, or fruit vegetables
+- `unit` - unit of measure such as box, crate, bunch, or case
 - `standard_price` - standard selling price for reporting or reference
+- `source_type` - whether the product is sourced from `OwnFarm` or `Outsourced`
+- `supplier_id` - linked supplier for outsourced products
 
 **Purpose**
-This table acts as the product master for inventory, order item tracking, prep work, and demand analysis.
+This table acts as the product master for inventory, order item tracking, prep work, and demand analysis. It also identifies whether products are farm-grown or sourced from outside suppliers.
 
 ---
 
@@ -102,7 +125,7 @@ Stores cleaned and standardized order headers after raw orders are reviewed and 
 **Key Columns**
 - `order_date` - date the cleaned order is recorded
 - `requested_delivery_date` - requested delivery date from the customer
-- `order_status` - current fulfillment status such as confirmed, partial, or short
+- `order_status` - current fulfillment status such as confirmed, partial fulfilled, or short
 - `cleaning_status` - status of order standardization or review
 - `total_items` - total number of line items in the order
 - `total_value` - total monetary value of the order
@@ -201,6 +224,7 @@ This table supports labor usage analysis, payroll tracking, and operational cost
 
 The main relationships in the schema are:
 
+- One `supplier` can provide many `products`
 - One `customer` can have many `orders_cleaned`
 - One `raw_order` can be transformed into one cleaned order record
 - One `order` can have many `order_items`
@@ -231,6 +255,8 @@ This schema is designed to support analysis such as:
 - How often do stockouts affect fulfillment?
 - What is the overall fill rate?
 - How much labor is used across prep and delivery work?
+- Are outsourced products more likely to have shortages than own-farmed products?
+- Which suppliers are linked to outsourced products in the catalog?
 - Where are the main operational bottlenecks?
 
 ## Design Notes
@@ -239,4 +265,6 @@ This schema is designed to support analysis such as:
 - `orders_cleaned` links cleaned orders back to the original raw intake
 - `order_items` separates requested quantity from confirmed quantity to support shortage and fulfillment analysis
 - `worker_shifts` includes `related_order_id` so labor can be connected to specific orders
+- `source_type` in `products` distinguishes between farm-grown items (`OwnFarm`) and externally sourced items (`Outsourced`)
+- `supplier_id` in `products` links outsourced items to a main supplier for MVP reporting purposes
 - `total_payment` is stored for reporting convenience in the MVP, although it can also be derived from `hours_worked * hourly_rate`

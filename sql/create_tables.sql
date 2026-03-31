@@ -6,12 +6,23 @@ CREATE TABLE customers (
     signup_date DATE
 );
 
+CREATE TABLE suppliers (
+    supplier_id INT PRIMARY KEY,
+    supplier_name VARCHAR(100) NOT NULL,
+    supplier_region VARCHAR(50),
+    supplier_type VARCHAR(50),
+    is_local BOOLEAN
+);
+
 CREATE TABLE products (
     product_id INT PRIMARY KEY,
     product_name VARCHAR(100) NOT NULL,
     category VARCHAR(50),
     unit VARCHAR(20),
-    standard_price DECIMAL(10, 2)
+    standard_price DECIMAL(10, 2),
+    source_type VARCHAR(30),
+    supplier_id INT,
+    FOREIGN KEY (supplier_id) REFERENCES suppliers(supplier_id)
 );
 
 CREATE TABLE inventory (
