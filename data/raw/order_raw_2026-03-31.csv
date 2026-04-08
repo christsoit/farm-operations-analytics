@@ -1,0 +1,9 @@
+raw_order_id,customer_name_raw,order_text,received_timestamp,source_channel,entered_by
+5001,Golden Basket Mkt,"Need 14 bx bok choy, 10 crates napa, 6 green onion for Wed AM",2026-03-31 17:45:00,SMS,Chris
+5002,Bay Fresh Produce,"send 12 choy sum 8 chinese broc 10 cs tomato for tomorrow",2026-03-31 18:10:00,WhatsApp,Chris
+5003,Harbor Wholesale,"Need 20 spinach and 12 baby bok for Wed dock drop",2026-03-31 18:35:00,Email,Amy
+5004,Sunrise Mkt,"10 napa, 8 romaine, 10 cilantro for Wed",2026-03-31 19:00:00,SMS,Chris
+5005,Evergreen Produce Ctr,"Need 15 bok choy + 10 water spinach + 6 okra",2026-03-31 19:20:00,Spreadsheet,System
+5006,Lee Family Kitchen,"need 3 tomato and 2 cilantro for lunch tomorrow",2026-03-31 19:45:00,WhatsApp,Chris
+5007,Wong Produce,"2 bok choy 2 napa 1 green onion pickup tmw",2026-03-31 20:05:00,SMS,Chris
+5008,Fresh Home Foods,"Please reserve 4 spinach, 2 tomato, 2 romaine for Thursday pickup",2026-03-31 20:30:00,Email,Amy

@@ -1,0 +1,13 @@
+inventory_id,product_id,inventory_date,available_quantity,warehouse_location
+1,1,2026-03-31,55.00,Warehouse A
+2,2,2026-03-31,18.00,Warehouse A
+3,3,2026-03-31,20.00,Warehouse B
+4,4,2026-03-31,10.00,Warehouse B
+5,5,2026-03-31,22.00,Cold Room 1
+6,6,2026-03-31,12.00,Warehouse A
+7,7,2026-03-31,8.00,Cold Room 2
+8,8,2026-03-31,70.00,Cold Room 1
+9,9,2026-03-31,20.00,Cold Room 2
+10,10,2026-03-31,12.00,Warehouse C
+11,11,2026-03-31,4.00,Warehouse C
+12,12,2026-03-31,12.00,Cold Room 2

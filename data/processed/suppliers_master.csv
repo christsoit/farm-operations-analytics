@@ -1,0 +1,4 @@
+supplier_id,supplier_name,supplier_region,supplier_type,is_local
+1,Northern Harvest Farm,Central Valley,External Farm,FALSE
+2,Valley Green Growers,Salinas,External Farm,FALSE
+3,Pacific Fresh Farms,Bakersfield,External Farm,FALSE

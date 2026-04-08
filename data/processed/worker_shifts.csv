@@ -1,0 +1,15 @@
+shift_id,worker_name,shift_date,task_type,hours_worked,hourly_rate,total_payment,related_order_id,notes
+9001,Maria,2026-04-01,Prep,4.00,22.00,88.00,1001,Prepared bok choy and napa cabbage
+9002,Leo,2026-04-01,Prep,3.50,21.00,73.50,1001,Prepared green onion and staging
+9003,Jenny,2026-04-01,Prep,4.50,22.00,99.00,1002,Packed choy sum and Chinese broccoli
+9004,Ben,2026-04-01,Prep,3.00,21.00,63.00,1002,Tomato allocation and packing
+9005,Maria,2026-04-01,Prep,5.00,22.00,110.00,1003,Prepared spinach and baby bok choy
+9006,Leo,2026-04-01,Prep,3.00,21.00,63.00,1004,Packed napa and romaine
+9007,Jenny,2026-04-01,Prep,2.50,22.00,55.00,1004,Bundled cilantro
+9008,Ben,2026-04-01,Prep,4.00,21.00,84.00,1005,Prepared bok choy water spinach and okra
+9009,Leo,2026-04-01,Prep,1.50,21.00,31.50,1006,Packed small customer order
+9010,Maria,2026-04-01,Prep,1.00,22.00,22.00,1007,Prepared pickup order items
+9011,Carlos,2026-04-01,Delivery,6.00,24.00,144.00,1001,Delivered major market route
+9012,Amy,2026-04-01,Delivery,5.50,24.00,132.00,1002,Delivered Bay Fresh and Sunrise route
+9013,Leo,2026-04-01,Delivery,2.00,24.00,48.00,1006,Delivered Gilroy small customer order
+9014,Jenny,2026-04-02,Prep,2.00,22.00,44.00,1008,Prepared next-day pickup order

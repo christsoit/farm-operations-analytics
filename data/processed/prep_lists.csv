@@ -1,0 +1,22 @@
+prep_id,order_id,product_id,quantity_to_prepare,prep_status,assigned_worker,prep_date
+1,1001,1,14.00,Completed,Maria,2026-04-01
+2,1001,2,8.00,Completed,Maria,2026-04-01
+3,1001,8,6.00,Completed,Leo,2026-04-01
+4,1002,3,12.00,Completed,Jenny,2026-04-01
+5,1002,4,8.00,Completed,Jenny,2026-04-01
+6,1002,10,7.00,Completed,Ben,2026-04-01
+7,1003,5,18.00,Completed,Maria,2026-04-01
+8,1003,7,8.00,Completed,Maria,2026-04-01
+9,1004,2,10.00,Completed,Leo,2026-04-01
+10,1004,12,8.00,Completed,Leo,2026-04-01
+11,1004,9,10.00,Completed,Jenny,2026-04-01
+12,1005,1,15.00,In Progress,Ben,2026-04-01
+13,1005,6,10.00,In Progress,Ben,2026-04-01
+14,1005,11,4.00,In Progress,Ben,2026-04-01
+15,1006,10,3.00,Completed,Leo,2026-04-01
+16,1006,9,2.00,Completed,Leo,2026-04-01
+17,1007,1,2.00,Ready,Maria,2026-04-01
+18,1007,8,1.00,Ready,Maria,2026-04-01
+19,1008,5,4.00,Pending,Jenny,2026-04-02
+20,1008,10,2.00,Pending,Jenny,2026-04-02
+21,1008,12,2.00,Pending,Jenny,2026-04-02

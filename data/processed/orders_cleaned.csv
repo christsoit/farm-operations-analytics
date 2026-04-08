@@ -1,0 +1,9 @@
+order_id,raw_order_id,customer_id,order_date,requested_delivery_date,order_status,cleaning_status,total_items,total_value,notes
+1001,5001,1,2026-03-31,2026-04-01,Partial Fulfilled,Cleaned,3,500.00,Napa cabbage partially fulfilled due to limited stock
+1002,5002,2,2026-03-31,2026-04-01,Partial Fulfilled,Cleaned,3,628.00,Tomato partially fulfilled due to outsourced stock shortage
+1003,5003,3,2026-03-31,2026-04-01,Partial Fulfilled,Cleaned,2,440.00,Baby bok choy limited by available harvest
+1004,5004,4,2026-03-31,2026-04-01,Confirmed,Cleaned,3,472.00,Confirmed in full
+1005,5005,5,2026-03-31,2026-04-01,Partial Fulfilled,Cleaned,3,600.00,Okra partially fulfilled due to low outsourced inventory
+1006,5006,6,2026-03-31,2026-04-01,Confirmed,Cleaned,2,104.00,Small customer delivery confirmed
+1007,5007,7,2026-03-31,2026-04-01,Partial Fulfilled,Cleaned,3,48.00,Napa cabbage unavailable for pickup order
+1008,5008,8,2026-03-31,2026-04-02,Confirmed,Cleaned,3,158.00,Pickup order confirmed

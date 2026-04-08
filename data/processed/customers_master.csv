@@ -1,0 +1,10 @@
+customer_id,customer_name,market_type,region,signup_date
+1,Golden Basket Market,Wholesale Market,San Jose,2025-01-15
+2,Bay Fresh Produce Market,Wholesale Market,San Francisco,2025-02-10
+3,Harbor Wholesale Market,Wholesale Market,Oakland,2025-03-05
+4,Sunrise Market,Wholesale Market,Santa Clara,2025-04-12
+5,Evergreen Produce Center,Wholesale Market,San Jose,2025-05-20
+6,Lee Family Kitchen,Individual Buyer,Gilroy,2025-06-18
+7,Wong Produce Buyer,Individual Buyer,Morgan Hill,2025-07-09
+8,Fresh Home Foods,Individual Buyer,Gilroy,2025-08-14
+9,Chen Market Pickup,Individual Buyer,San Jose,2025-09-03

@@ -1,0 +1,13 @@
+product_id,product_name,category,unit,standard_price,source_type,supplier_id
+1,Bok Choy,Leafy Greens,box,18.00,OwnFarm,
+2,Napa Cabbage,Leafy Greens,crate,22.00,OwnFarm,
+3,Choy Sum,Leafy Greens,box,20.00,OwnFarm,
+4,Chinese Broccoli,Leafy Greens,box,24.00,OwnFarm,
+5,Spinach,Leafy Greens,box,16.00,OwnFarm,
+6,Water Spinach,Leafy Greens,box,21.00,OwnFarm,
+7,Baby Bok Choy,Leafy Greens,box,19.00,OwnFarm,
+8,Green Onion,Herbs,bunch,12.00,Outsourced,1
+9,Cilantro,Herbs,bunch,10.00,Outsourced,2
+10,Tomato,Fruit Vegetables,case,28.00,Outsourced,1
+11,Okra,Fruit Vegetables,box,30.00,Outsourced,3
+12,Romaine Lettuce,Leafy Greens,box,19.00,Outsourced,2
