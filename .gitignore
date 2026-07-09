@@ -210,3 +210,9 @@ __marimo__/
 
 # Files to be ignored
 docs/next_steps.md
+
+# dbt
+farm_analytics/profiles.yml
+farm_analytics/target/
+farm_analytics/dbt_packages/
+farm_analytics/logs/

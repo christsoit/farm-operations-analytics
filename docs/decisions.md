@@ -61,3 +61,59 @@ Created explicit indexes on:
 - All date columns (time-series queries are dominant pattern)
 - All status columns (heavily filtered in analytics)
 - Composite index on (customer_id, order_date DESC) for customer history queries
+  
+
+## Data Generation Approach
+
+### Master data seeding via Python scripts
+
+Chose Python + psycopg2 over manual SQL imports because:
+- Reproducible and version-controlled
+- Handles errors gracefully (skip vs crash)
+- Programmatic control over distributions and randomness
+- Matches production data engineering practice
+
+### Idempotent seed scripts (ON CONFLICT pattern)
+
+All dimension table scripts use `ON CONFLICT DO UPDATE`:
+- Safe to re-run without duplicates
+- `xmax = 0` trick distinguishes fresh inserts from conflict updates
+- Preserves referential integrity for downstream fact tables
+- Explicit `updated_at = CURRENT_TIMESTAMP` because DEFAULT
+  only fires on INSERT, not UPDATE
+
+### Domain-specific data over generic Faker
+
+Hand-crafted:
+- Product catalog (Chinese-American vegetables)
+- Restaurant/grocery name generators (weighted prefix + suffix lists)
+- Supplier list (Bay Area produce distribution context)
+- Worker names and roles
+
+Generic Faker output would have undermined the project's narrative.
+Faker is used only where it adds value: signup dates, individual customer names.
+
+### FK resolution via lookup maps
+
+Products reference suppliers by name in source data (readability),
+resolved to IDs via one-time query at script start:
+
+1. Query dimension table: `SELECT id, name FROM suppliers`
+2. Build lookup dict: `{name: id for id, name in rows}`
+3. For each record: translate name → id before insert
+4. Skip records with missing references (log warning, continue)
+
+This pattern will extend to Day 2 fact tables that reference
+multiple dimensions (customers, products, workers).
+
+### Configuration via environment variables
+
+Database credentials stored in `.env` file (gitignored), loaded via
+`python-dotenv`. Follows 12-factor app methodology — configuration
+outside code, no secrets in source control.
+
+### Reproducibility via random seeds
+
+`Faker.seed(42)` and `random.seed(42)` make "random" data deterministic.
+Anyone cloning the repo gets identical data. Enables reliable testing
+of idempotency (same input → same output).
