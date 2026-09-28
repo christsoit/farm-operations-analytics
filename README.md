@@ -12,7 +12,7 @@ An end-to-end analytics project modeling operations for a Bay Area produce distr
 
 This project models a produce distribution workflow for a wholesale/retail supplier. Customer orders arrive in inconsistent formats (SMS, email, phone notes), get cleaned and standardized, checked against inventory, confirmed, prepared, scheduled for delivery, and tracked alongside driver labor. The goal is operational visibility: fill rates, delivery performance, product demand, customer concentration, and driver productivity.
 
-All data is synthetically generated to model realistic operational patterns. It does not represent a real company.
+All data is synthetically generated to model realistic operational patterns. It modeled on a real family-owned produce distributor; data is synthetic to protect confidentiality.
 
 ---
 
