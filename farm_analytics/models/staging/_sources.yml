@@ -1,0 +1,31 @@
+version: 2
+
+sources:
+  - name: raw
+    description: >
+      Operational tables copied from PostgreSQL into Snowflake by
+      scripts/load_to_snowflake.py. Loaded as-is; all logic lives in dbt.
+    schema: "{{ env_var('RAW_SCHEMA', 'RAW') }}"
+    tables:
+      - name: customers
+        description: Buyers (restaurants, grocery, wholesale, individuals).
+      - name: suppliers
+        description: Produce sources (own farm, external farms, distributors).
+      - name: workers
+        description: Prep staff, drivers and supervisors.
+      - name: products
+        description: Produce catalog with standard price and source type.
+      - name: inventory
+        description: Daily availability snapshot per product and warehouse.
+      - name: incoming_orders_raw
+        description: Unparsed order messages exactly as received (text, email, phone, spreadsheet).
+      - name: orders_cleaned
+        description: Parsed order headers, linked back to the raw message.
+      - name: order_items
+        description: Order line items (one row per order x product).
+      - name: prep_lists
+        description: Prep tasks generated from confirmed orders.
+      - name: deliveries
+        description: Outbound deliveries (one per order).
+      - name: worker_shifts
+        description: Labor hours by worker, date and task.

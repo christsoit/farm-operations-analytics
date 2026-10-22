@@ -1,0 +1,200 @@
+version: 2
+
+# Tests here mirror the Postgres constraints (PK, FK, CHECK enums), so a bad
+# load into Snowflake fails loudly in `dbt build` instead of skewing KPIs.
+
+models:
+  - name: stg_customers
+    columns:
+      - name: customer_id
+        data_tests: [unique, not_null]
+      - name: customer_name
+        data_tests: [unique, not_null]
+      - name: market_type
+        data_tests:
+          - accepted_values:
+              arguments:
+                values: ['restaurant', 'grocery', 'wholesale', 'distributor', 'individual', 'other']
+
+  - name: stg_suppliers
+    columns:
+      - name: supplier_id
+        data_tests: [unique, not_null]
+      - name: supplier_type
+        data_tests:
+          - accepted_values:
+              arguments:
+                values: ['own_farm', 'external_farm', 'distributor', 'wholesale_market']
+
+  - name: stg_workers
+    columns:
+      - name: worker_id
+        data_tests: [unique, not_null]
+      - name: worker_role
+        data_tests:
+          - accepted_values:
+              arguments:
+                values: ['prep', 'driver', 'multi_role', 'supervisor']
+
+  - name: stg_products
+    columns:
+      - name: product_id
+        data_tests: [unique, not_null]
+      - name: source_type
+        data_tests:
+          - accepted_values:
+              arguments:
+                values: ['own_farm', 'outsourced', 'mixed']
+      - name: supplier_id
+        description: Nullable; some products are aggregated from several suppliers.
+        data_tests:
+          - relationships:
+              arguments:
+                to: ref('stg_suppliers')
+                field: supplier_id
+
+  - name: stg_inventory
+    data_tests:
+      - unique_combination:
+          arguments:
+            columns: ['product_id', 'inventory_date', 'warehouse_location']
+    columns:
+      - name: inventory_id
+        data_tests: [unique, not_null]
+      - name: product_id
+        data_tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('stg_products')
+                field: product_id
+
+  - name: stg_incoming_orders_raw
+    columns:
+      - name: raw_order_id
+        data_tests: [unique, not_null]
+      - name: source_channel
+        data_tests:
+          - accepted_values:
+              arguments:
+                values: ['text', 'email', 'phone', 'spreadsheet', 'in_person', 'other']
+
+  - name: stg_orders
+    columns:
+      - name: order_id
+        data_tests: [unique, not_null]
+      - name: raw_order_id
+        data_tests:
+          - relationships:
+              arguments:
+                to: ref('stg_incoming_orders_raw')
+                field: raw_order_id
+      - name: customer_id
+        data_tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('stg_customers')
+                field: customer_id
+      - name: order_status
+        data_tests:
+          - accepted_values:
+              arguments:
+                values: ['pending', 'confirmed', 'fulfilled', 'partial', 'shorted', 'cancelled']
+      - name: cleaning_status
+        data_tests:
+          - accepted_values:
+              arguments:
+                values: ['clean', 'needs_review', 'incomplete', 'rejected']
+
+  - name: stg_order_items
+    data_tests:
+      - unique_combination:
+          arguments:
+            columns: ['order_id', 'product_id']
+    columns:
+      - name: order_item_id
+        data_tests: [unique, not_null]
+      - name: order_id
+        data_tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('stg_orders')
+                field: order_id
+      - name: product_id
+        data_tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('stg_products')
+                field: product_id
+      - name: item_status
+        data_tests:
+          - accepted_values:
+              arguments:
+                values: ['pending', 'confirmed', 'fulfilled', 'partial', 'shorted', 'cancelled']
+
+  - name: stg_prep_lists
+    columns:
+      - name: prep_id
+        data_tests: [unique, not_null]
+      - name: order_id
+        data_tests:
+          - relationships:
+              arguments:
+                to: ref('stg_orders')
+                field: order_id
+      - name: assigned_worker_id
+        data_tests:
+          - relationships:
+              arguments:
+                to: ref('stg_workers')
+                field: worker_id
+      - name: prep_status
+        data_tests:
+          - accepted_values:
+              arguments:
+                values: ['pending', 'assigned', 'in_progress', 'completed', 'cancelled']
+
+  - name: stg_deliveries
+    columns:
+      - name: delivery_id
+        data_tests: [unique, not_null]
+      - name: order_id
+        description: One delivery per order (MVP simplification, see docs/decisions.md).
+        data_tests:
+          - unique
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('stg_orders')
+                field: order_id
+      - name: driver_worker_id
+        data_tests:
+          - relationships:
+              arguments:
+                to: ref('stg_workers')
+                field: worker_id
+      - name: delivery_status
+        data_tests:
+          - accepted_values:
+              arguments:
+                values: ['scheduled', 'in_transit', 'delivered', 'failed', 'cancelled']
+
+  - name: stg_worker_shifts
+    columns:
+      - name: shift_id
+        data_tests: [unique, not_null]
+      - name: worker_id
+        data_tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('stg_workers')
+                field: worker_id
+      - name: task_type
+        data_tests:
+          - accepted_values:
+              arguments:
+                values: ['prep', 'delivery', 'cleaning', 'inventory', 'admin', 'other']

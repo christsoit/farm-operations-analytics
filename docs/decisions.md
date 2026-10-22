@@ -205,3 +205,37 @@ patterns.
 The ERD was authored in DBML and rendered via dbdiagram.io, exported as PNG
 and shared via a public link. The diagram reflects the live schema rather
 than a hand-drawn mockup.
+---
+
+## Warehouse & Transformation Layer (Snowflake + dbt)
+
+### ELT instead of ETL
+Postgres tables are copied into Snowflake `RAW` unchanged; every rule lives in
+dbt. Rationale: one place for business logic, version-controlled and tested,
+and raw data stays available to reprocess when logic changes.
+
+### Full-refresh load
+`load_to_snowflake.py` overwrites each RAW table on every run.
+Rationale: tables are small, so a full refresh is cheaper to maintain than
+incremental logic and is idempotent by design. Revisit (incremental models,
+`updated_at` watermark) if volume grows.
+
+### Constraints become tests
+Snowflake does not enforce foreign keys or CHECK constraints. Each Postgres
+constraint is re-expressed as a dbt test (`relationships`, `accepted_values`,
+`unique_combination`, singular tests) so a bad load fails `dbt build`.
+
+### Business logic defined once
+Line revenue, shortage and the on-time rule live in ephemeral intermediate
+models. Every KPI table reads from the same facts, and a tie-out test checks
+that revenue agrees across marts.
+
+### Reconciliation as a warning
+`fct_orders` compares stored header totals with line-item totals. The test is
+`severity: warn`: mismatches are a data-quality queue to review, not a reason
+to stop the daily build.
+
+### Cost and security on Snowflake
+X-Small warehouse with 60-second auto-suspend; a `TRANSFORMER` role limited to
+the FARM_OPS database; a service user with key-pair authentication; no
+credentials in the repo (env vars and GitHub secrets only).

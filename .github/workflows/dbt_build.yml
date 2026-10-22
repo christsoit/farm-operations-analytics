@@ -1,0 +1,61 @@
+name: dbt build (Snowflake)
+
+# Rebuilds every model and runs every data test against Snowflake:
+#   - daily at 13:00 UTC (6 AM Pacific), so dashboards read fresh marts
+#   - on every push to main that touches the dbt project
+#   - on demand from the Actions tab
+on:
+  schedule:
+    - cron: "0 13 * * *"
+  push:
+    branches: [main]
+    paths: ["farm_analytics/**", ".github/workflows/dbt_build.yml"]
+  workflow_dispatch:
+
+concurrency:
+  group: dbt-prod
+  cancel-in-progress: false
+
+jobs:
+  dbt-build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    defaults:
+      run:
+        working-directory: farm_analytics
+    env:
+      SNOWFLAKE_ACCOUNT: ${{ secrets.SNOWFLAKE_ACCOUNT }}
+      SNOWFLAKE_USER: ${{ secrets.SNOWFLAKE_USER }}
+      SNOWFLAKE_ROLE: TRANSFORMER
+      SNOWFLAKE_WAREHOUSE: FARM_WH
+      SNOWFLAKE_DATABASE: FARM_OPS
+      SNOWFLAKE_PRIVATE_KEY_PATH: ${{ github.workspace }}/snowflake_key.p8
+      DBT_PROFILES_DIR: ${{ github.workspace }}/farm_analytics
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install dbt
+        run: pip install "dbt-core>=1.10.8,<2.0" "dbt-snowflake>=1.10,<2.0"
+
+      - name: Write Snowflake key and profile
+        run: |
+          printf '%s\n' "${{ secrets.SNOWFLAKE_PRIVATE_KEY }}" > "$SNOWFLAKE_PRIVATE_KEY_PATH"
+          chmod 600 "$SNOWFLAKE_PRIVATE_KEY_PATH"
+          cp profiles.yml.example profiles.yml
+
+      - name: dbt build (models + tests)
+        run: dbt build --target prod
+
+      - name: Upload run artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: dbt-artifacts
+          path: |
+            farm_analytics/target/run_results.json
+            farm_analytics/target/manifest.json
+          if-no-files-found: ignore
