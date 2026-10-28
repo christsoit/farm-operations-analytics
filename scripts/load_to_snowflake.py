@@ -48,6 +48,17 @@ TABLES = [
 
 RAW_SCHEMA = "RAW"
 
+# Postgres type -> pandas dtype, used only when a table is empty
+PG_TO_PANDAS = {
+    "integer": "Int64",
+    "bigint": "Int64",
+    "numeric": "float64",
+    "character varying": "string",
+    "text": "string",
+    "date": "datetime64[ns]",
+    "timestamp without time zone": "datetime64[ns]",
+}
+
 
 def snowflake_connection():
     return snowflake.connector.connect(
@@ -64,6 +75,22 @@ def snowflake_connection():
 def extract(pg_conn, table):
     """Read one Postgres table into a DataFrame with upper-case columns."""
     df = pd.read_sql(f"SELECT * FROM {table}", pg_conn)
+
+    # An empty table gives pandas no values to infer types from, so
+    # write_pandas would create every column as NUMBER. Take the types
+    # from Postgres instead.
+    if df.empty:
+        with pg_conn.cursor() as cur:
+            cur.execute(
+                "SELECT column_name, data_type FROM information_schema.columns "
+                "WHERE table_name = %s",
+                (table,),
+            )
+            pg_types = dict(cur.fetchall())
+        for col, pg_type in pg_types.items():
+            if pg_type in PG_TO_PANDAS:
+                df[col] = df[col].astype(PG_TO_PANDAS[pg_type])
+
     # Unquoted Snowflake identifiers are upper-case; matching that keeps
     # dbt source references case-insensitive.
     df.columns = [c.upper() for c in df.columns]
