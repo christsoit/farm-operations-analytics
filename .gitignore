@@ -216,3 +216,7 @@ farm_analytics/profiles.yml
 farm_analytics/target/
 farm_analytics/dbt_packages/
 farm_analytics/logs/
+# Snowflake key pair -- never commit
+*.p8
+*.pub
+farm_analytics/.user.yml

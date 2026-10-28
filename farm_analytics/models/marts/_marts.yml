@@ -1,0 +1,103 @@
+version: 2
+
+models:
+  # ---------------- core ----------------
+  - name: dim_customers
+    description: One row per customer with lifetime order metrics.
+    columns:
+      - name: customer_id
+        data_tests: [unique, not_null]
+
+  - name: dim_products
+    description: One row per product with its supplier attributes.
+    columns:
+      - name: product_id
+        data_tests: [unique, not_null]
+
+  - name: dim_workers
+    description: One row per worker.
+    columns:
+      - name: worker_id
+        data_tests: [unique, not_null]
+
+  - name: fct_order_items
+    description: Grain = one order line (order x product). Main fact for fill rate, revenue and demand.
+    columns:
+      - name: order_item_id
+        data_tests: [unique, not_null]
+      - name: confirmed_quantity
+        description: Confirmed units; unconfirmed lines count as 0.
+      - name: confirmed_revenue
+        description: confirmed_quantity x unit_price.
+
+  - name: fct_orders
+    description: >
+      Grain = one cleaned order. Rebuilds totals from line items and flags
+      orders whose stored header totals don't match (reconciliation_status).
+    columns:
+      - name: order_id
+        data_tests: [unique, not_null]
+      - name: reconciliation_status
+        data_tests:
+          - accepted_values:
+              arguments:
+                values: ['reconciled', 'no_header_total', 'item_count_mismatch', 'value_mismatch']
+
+  - name: fct_deliveries
+    description: Grain = one delivery. is_on_time = delivered on the scheduled date.
+    columns:
+      - name: delivery_id
+        data_tests: [unique, not_null]
+      - name: is_on_time
+        data_tests:
+          - accepted_values:
+              arguments:
+                values: [0, 1]
+                quote: false
+
+  - name: fct_worker_shifts
+    description: Grain = one shift record. labor_cost = hours x rate.
+    columns:
+      - name: shift_id
+        data_tests: [unique, not_null]
+
+  # ---------------- kpi (one table per dashboard view) ----------------
+  - name: kpi_overview
+    description: "Single-row header tiles - orders, confirmed revenue, overall fill rate."
+  - name: kpi_weekly_orders
+    columns:
+      - name: week_start
+        data_tests: [unique, not_null]
+  - name: kpi_weekly_fill_rate
+    columns:
+      - name: week_start
+        data_tests: [unique, not_null]
+  - name: kpi_daily_on_time_delivery
+    columns:
+      - name: delivery_date
+        data_tests: [unique, not_null]
+  - name: kpi_driver_productivity
+    columns:
+      - name: driver_worker_id
+        data_tests: [unique, not_null]
+  - name: kpi_customer_revenue
+    columns:
+      - name: customer_id
+        data_tests: [unique, not_null]
+  - name: kpi_revenue_by_market
+    columns:
+      - name: market_type
+        data_tests: [unique, not_null]
+  - name: kpi_product_demand
+    columns:
+      - name: product_id
+        data_tests: [unique, not_null]
+  - name: kpi_source_type_fill_rate
+    columns:
+      - name: source_type
+        data_tests: [unique, not_null]
+  - name: kpi_weekly_inventory
+    data_tests:
+      - unique_combination:
+          arguments:
+            columns: ['week_start', 'category']

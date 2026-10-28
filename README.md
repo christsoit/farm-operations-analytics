@@ -75,6 +75,9 @@ Techniques used: CTEs, window functions (rolling averages, `RANK`, `NTILE`), con
 - **PostgreSQL** — dimensional schema, constraints, indexing
 - **Python** (psycopg2, python-dotenv, Faker) — idempotent data generation pipelines
 - **Tableau Public** — interactive dashboard
+- **Snowflake** — cloud warehouse (RAW → STAGING → CORE → KPI), key-pair auth, X-Small auto-suspend warehouse
+- **dbt** — layered transformations, 90+ data tests, docs and lineage ([`farm_analytics/`](farm_analytics/))
+- **GitHub Actions** — scheduled daily `dbt build` against Snowflake
 - **dbdiagram.io** — ERD from live schema
 
 ---
@@ -88,7 +91,10 @@ Techniques used: CTEs, window functions (rolling averages, `RANK`, `NTILE`), con
 │   ├── schema/            create_tables.sql, indexes.sql
 │   ├── seed/              insert_sample_data.sql
 │   └── analytics/         kpi_queries.sql
-├── scripts/               Python generation pipelines
+├── scripts/               Python generation pipelines + load_to_snowflake.py
+├── snowflake/             setup.sql (warehouse, database, schemas, role, service user)
+├── farm_analytics/        dbt project: staging, intermediate, marts (core + kpi), tests
+├── .github/workflows/     dbt_build.yml (scheduled dbt build)
 ├── docs/                  decisions.md, project_scope..md, schema.md, workflow.md
 ├── dashboard/             Tableau workbook + exported CSVs
 ├── images/                dashboard + ERD screenshots
@@ -123,6 +129,27 @@ python scripts/generate_deliveries.py
 4. Run the KPI queries in `sql/analytics/kpi_queries.sql`.
 5. The Tableau dashboard reads from the exported CSVs in `dashboard/tableau_data/`.
 
+### Snowflake + dbt
+
+1. Create a key pair for the Snowflake service user (keep the `.p8` file private):
+```
+openssl genrsa 2048 | openssl pkcs8 -topk8 -inform PEM -out snowflake_key.p8 -nocrypt
+openssl rsa -in snowflake_key.p8 -pubout -out snowflake_key.pub
+```
+2. Paste the public key into `snowflake/setup.sql` and run it in a Snowsight worksheet as ACCOUNTADMIN.
+3. Fill in the Snowflake values in `.env` (see `.env.example`) and install dependencies:
+```
+pip install -r requirements-snowflake.txt
+```
+4. Load Postgres into Snowflake, then build and test the models:
+```
+python scripts/load_to_snowflake.py
+cd farm_analytics && cp profiles.yml.example profiles.yml
+set -a && source ../.env && set +a
+dbt build
+```
+5. For scheduled runs, add `SNOWFLAKE_ACCOUNT`, `SNOWFLAKE_USER` and `SNOWFLAKE_PRIVATE_KEY` (contents of the `.p8` file) as GitHub repository secrets.
+
 ---
 
 ## Documentation
@@ -137,6 +164,6 @@ python scripts/generate_deliveries.py
 ## Notes & Next Steps
 
 - Data uses uniform random generation; a v2 would add weighted business distributions (seasonal demand, customer-type order frequency) for more realistic trends.
-- A dbt transformation layer is a planned next step to formalize the staging → marts modeling currently done in SQL.
+- ~~A dbt transformation layer~~ Done: see [`farm_analytics/`](farm_analytics/). Next: point Tableau directly at the Snowflake KPI tables instead of exported CSVs.
 
 
