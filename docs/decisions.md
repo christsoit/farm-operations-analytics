@@ -235,7 +235,16 @@ that revenue agrees across marts.
 `severity: warn`: mismatches are a data-quality queue to review, not a reason
 to stop the daily build.
 
+**Current result (first Snowflake run):** 473 orders flag `value_mismatch`.
+Item counts match on every order, but the header `total_value` matches neither
+the requested nor the confirmed line value. The synthetic data generator created
+header values independently of the line items, so this reflects the test data,
+not the pipeline. On real intake data the check would flag only true mismatches.
+The other 27 orders are `no_header_total`: orders with no line items.
+
 ### Cost and security on Snowflake
 X-Small warehouse with 60-second auto-suspend; a `TRANSFORMER` role limited to
 the FARM_OPS database; a service user with key-pair authentication; no
 credentials in the repo (env vars and GitHub secrets only).
+
+
